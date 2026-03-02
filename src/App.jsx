@@ -26,6 +26,11 @@ function deriveActivePlayer(gameTurns) {
 }
 
 function App() {
+  //new state where we store the current player names
+  const [players, setPlayers] = useState({
+    X: 'Player 1',
+    O: 'Player 2'
+  });
   //In this tic-tac-toe game, we derive everything from the state below.
   const [gameTurns, setGameTurns] = useState([]);
 
@@ -55,7 +60,7 @@ function App() {
     if (firstSquareSymbol && 
         firstSquareSymbol === secondSquareSymbol && 
         firstSquareSymbol === thirdSquareSymbol){
-        winner = firstSquareSymbol;
+        winner = players[firstSquareSymbol];
     }
   }
 
@@ -65,7 +70,6 @@ function App() {
     //setActivePlayer(prevPlayer => prevPlayer === 'X' ? 'O' : 'X');
     setGameTurns(prevTurns => {
       const currPlayer = deriveActivePlayer(prevTurns);
-
 
       const updatedTruns = [
         {square: {row: rowIndex, col: colIndex}, player: currPlayer}, 
@@ -81,11 +85,29 @@ function App() {
     setGameTurns([]);
   }
 
+  function handlePlayerName(symbol, newName){
+    setPlayers(prevPlayers => {
+      return {
+        ...prevPlayers,
+        [symbol]: newName
+      };
+    });
+  }
+
   return <main>
     <div id="game-container">
       <ol id="players" className='highlight-player'>
-        <Player name="Player 1" symbol="X" isActive={activePlayer === 'X'} />
-        <Player name="Player 2" symbol="O" isActive={activePlayer === 'O'} />
+        <Player name="Player 1" 
+                symbol="X" 
+                isActive={activePlayer === 'X'} 
+                onChangeName={handlePlayerName}
+        />
+        
+        <Player name="Player 2"
+                symbol="O" 
+                isActive={activePlayer === 'O'} 
+                onChangeName={handlePlayerName}
+        />
       </ol>
 
       {(isDraw ||winner) && <GameOver winner={winner} onRestart={handleRestart}/>}

@@ -9,7 +9,13 @@ import GameOver from './components/GameOver.jsx'
 
 import { winningCombinations } from './winningCombinations.js'
 
-const initialGameBoard = [
+//General Constants Variables
+const PLAYERS = {
+  X: 'Player 1', 
+  O: 'Player 2'
+}
+
+const INITIAL_GAME_BOARD = [
     [null, null, null,],
     [null, null, null,],
     [null, null, null]
@@ -25,23 +31,8 @@ function deriveActivePlayer(gameTurns) {
     return currPlayer;
 }
 
-function App() {
-  //new state where we store the current player names
-  const [players, setPlayers] = useState({
-    X: 'Player 1',
-    O: 'Player 2'
-  });
-  //In this tic-tac-toe game, we derive everything from the state below.
-  const [gameTurns, setGameTurns] = useState([]);
-
-  // const [ isWinner, setIsWinner ] = useState(false); 
-  // ^ this is a redundant state, because we can derive a winner in the gameTurns.
-
-  // const [activePlayer, setActivePlayer] = useState('X');
-
-  const activePlayer = deriveActivePlayer(gameTurns);
-
-  let gameBoard = [...initialGameBoard.map(array => [...array])];
+function deriveBoard(gameTurns){
+  let gameBoard = [...INITIAL_GAME_BOARD.map(array => [...array])];
   
   for (const turn of gameTurns){
      const { square, player } = turn;
@@ -50,7 +41,11 @@ function App() {
      gameBoard[row][col] = player;
   }
 
-  let winner = null;
+  return gameBoard;
+}
+
+function deriveWinner( gameBoard, players){
+    let winner = null;
 
   for(const combination of winningCombinations){
     const firstSquareSymbol = gameBoard[combination[0].row][combination[0].col];
@@ -64,6 +59,24 @@ function App() {
     }
   }
 
+  return winner;
+}
+
+function App() {
+  //new state where we store the current player names
+  const [players, setPlayers] = useState(PLAYERS);
+  //In this tic-tac-toe game, we derive everything from the state below.
+  const [gameTurns, setGameTurns] = useState([]);
+
+  // const [ isWinner, setIsWinner ] = useState(false); 
+  // ^ this is a redundant state, because we can derive a winner in the gameTurns.
+
+  // const [activePlayer, setActivePlayer] = useState('X');
+
+  const activePlayer = deriveActivePlayer(gameTurns);
+  const gameBoard = deriveBoard(gameTurns);
+
+  const winner = deriveWinner(gameBoard, players);
   const isDraw = gameTurns.length === 9 && !winner;
 
   function handleSelectSquare(rowIndex, colIndex) {
@@ -97,13 +110,13 @@ function App() {
   return <main>
     <div id="game-container">
       <ol id="players" className='highlight-player'>
-        <Player name="Player 1" 
+        <Player name={PLAYERS.X} 
                 symbol="X" 
                 isActive={activePlayer === 'X'} 
                 onChangeName={handlePlayerName}
         />
         
-        <Player name="Player 2"
+        <Player name={PLAYERS.O}
                 symbol="O" 
                 isActive={activePlayer === 'O'} 
                 onChangeName={handlePlayerName}
